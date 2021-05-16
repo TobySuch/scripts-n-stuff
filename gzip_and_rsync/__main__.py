@@ -3,6 +3,7 @@ import subprocess
 import configparser
 import datetime
 import logging
+import sys
 
 
 def gzip_folders(dest_path, *source_folders):
@@ -27,15 +28,19 @@ def rsync_files(source_path, rsync_username, rsync_hostname, dest_path,
 
 
 if __name__ == "__main__":
+    if len(sys.argv) == 2:
+        config_path = sys.argv[1]
+    else:
+        config_path = "config.cfg"
+
     config = configparser.ConfigParser()
-    config.read("gzip_and_rsync/config.cfg")
+    config.read(config_path)
     log_file = config.get("General", "log_file")
     log_level = config.get("General", "log_level").upper()
 
     log_level_e = getattr(logging, log_level.upper())
 
-    logging.basicConfig(filename=log_file, encoding='utf-8',
-                        level=log_level_e, format='%(asctime)s %(message)s')
+    logging.basicConfig(filename=log_file, level=log_level_e, format='%(asctime)s %(message)s')
 
     paths = config.get("GZIP", "paths").strip().splitlines()
     temp_path = config.get("GZIP", "temp_path")
